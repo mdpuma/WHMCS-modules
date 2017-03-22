@@ -2,13 +2,15 @@
 
 function bpay_config() {
     $configarray = array(
-     "FriendlyName" => array("Type" => "System", "Value"=>"Bpay"),
-     "merchantid" => array("FriendlyName" => "Merchant ID", "Type" => "text", "Size" => "20", ),
-     "signature" => array("FriendlyName" => "Signature", "Type" => "text", "Size" => "20", ),
-     "success_url" => array("FriendlyName" => "Success URL", "Type" => "text", "Size" => "50", ),
-     "fail_url" => array("FriendlyName" => "Fail URL", "Type" => "text", "Size" => "50", ),
-     "button_name" => array("FriendlyName" => "Button Name", "Type" => "text", "Size" => "20", ),
-     "testmode" => array("FriendlyName" => "Test Mode", "Type" => "dropdown", "Options" => "1,0", "Description" => "Select (1) to test", ),
+     "FriendlyName" => array("Type" => "System", "Value"=>"bpay.md"),
+     "merchantid" => array("FriendlyName" => "Merchant ID", "Type" => "text", "Size" => "20"),
+     "signature" => array("FriendlyName" => "Signature", "Type" => "text", "Size" => "20" ),
+     "success_url" => array("FriendlyName" => "Success URL", "Type" => "text", "Size" => "50"),
+     "fail_url" => array("FriendlyName" => "Fail URL", "Type" => "text", "Size" => "50"),
+     "button_name" => array("FriendlyName" => "Button Name", "Type" => "text", "Size" => "20" ),
+     "testmode" => array("FriendlyName" => "Test Mode", "Type" => "dropdown", "Options" => "1,0", "Description" => "Select (1) to test"),
+     "bpaymethod" => array("FriendlyName" => "Bpay method", "Type" => "dropdown", "Options" => "bpay,card_eur"),
+     "localapi_user" => array("FriendlyName" => "Username for LocalAPI", "Type" => "text", "Size" => "50", "Description" => "Read more here https://developers.whmcs.com/api/internal-api/"),
      //"instructions" => array("FriendlyName" => "Payment Instructions", "Type" => "textarea", "Rows" => "5", "Description" => "Do this then do that etc...", ),
 //     "testmode" => array("FriendlyName" => "Test Mode", "Type" => "yesno", "Description" => "Tick this to test", ),
     );
@@ -53,7 +55,7 @@ function bpay_link($params) {
                 <merchantid>".$gatewaymerchantid."</merchantid>
                 <amount>".$amount."</amount>
                 <description>".$description."</description>
-                <method>bpay</method>
+                <method>".$params['bpaymethod']."</method>
                 <order_id>".$invoiceid."</order_id>
                 <success_url>".htmlspecialchars($params['success_url'])."</success_url>
                 <fail_url>".htmlspecialchars($params['fail_url'])."</fail_url>
