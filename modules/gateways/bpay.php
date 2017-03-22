@@ -2,10 +2,11 @@
 
 function bpay_config()
 {
+    $gatewayModuleName = basename(__FILE__, '.php');
     $configarray = array(
         "FriendlyName" => array(
             "Type" => "System",
-            "Value" => "bpay.md"
+            "Value" => $gatewayModuleName
         ),
         "merchantid" => array(
             "FriendlyName" => "Merchant ID",
@@ -41,7 +42,8 @@ function bpay_config()
         "bpaymethod" => array(
             "FriendlyName" => "Bpay method",
             "Type" => "dropdown",
-            "Options" => "bpay,card_eur"
+            "Options" => "bpay,card,card_eur,webmoneycat,wmrcat,bitcoin",
+            "Description" => "card - card mdl, card_eur - card euro, webmoneycat - webmoney wmz, wmrcat - webmoney wmr"
         ),
         "localapi_user" => array(
             "FriendlyName" => "Username for LocalAPI",
