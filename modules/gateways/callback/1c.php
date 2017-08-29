@@ -13,7 +13,7 @@ case 'getinvoice': {
             'invoiceid' => $invoiceid
         ) , $localapi_user);
         // var_dump($invoice_data);
-        if ($invoice_data['result'] === 'error') {
+        if ($invoice_data['status'] === 'error') {
             print json_encode(array(
                 'status' => 'error',
                 'reason' => 'inexistent invoice'
