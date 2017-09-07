@@ -1,4 +1,3 @@
-
 <?php
 require_once __DIR__ . '/../../../init.php';
 require_once __DIR__ . '/../../../includes/gatewayfunctions.php';
@@ -6,6 +5,7 @@ require_once __DIR__ . '/../../../includes/invoicefunctions.php';
 $localapi_user      = 'bpay';
 $req_currency_code  = 'MDL';
 $idno_customfieldid = '449';
+$tax_rate           = '20'; // add x percent
 $invoiceid          = intval($_GET['invoiceid']);
 $action             = $_GET['action'];
 switch ($action) {
@@ -57,11 +57,15 @@ switch ($action) {
         }
         if ($conversion_rate != 1) {
             foreach ($items as $i => $j) {
-                $items[$i]['amount'] = round($j['amount'] * $conversion_rate, 3);
-                unset($items[$i]['id']);
-                unset($items[$i]['relid']);
+                $items[$i]['amount']      = round($j['amount'] * $conversion_rate, 3);
                 $list                     = explode("\n", $items[$i]['description']);
                 $items[$i]['description'] = $list[0];
+                if ($j['taxed'] == 1) {
+                    $items[$i]['amount'] += $items[$i]['amount'] * $tax_rate / 100;
+                }
+                unset($items[$i]['id']);
+                unset($items[$i]['relid']);
+                unset($items[$i]['taxed']);
             }
         }
         // var_dump($items);
