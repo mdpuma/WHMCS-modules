@@ -2,18 +2,25 @@
 require_once __DIR__ . '/../../../init.php';
 require_once __DIR__ . '/../../../includes/gatewayfunctions.php';
 require_once __DIR__ . '/../../../includes/invoicefunctions.php';
-$localapi_user      = 'bpay';
+$localapi_user      = '1c_module';
 $req_currency_code  = 'MDL';
 $idno_customfieldid = '449';
 $tax_rate           = '20'; // add x percent
-$invoiceid          = intval($_GET['invoiceid']);
 $action             = $_GET['action'];
+$allowed_ips        = array('185.181.228.28', '89.28.42.226');
+foreach($allowed_ips as $allow) {
+    if($_SERVER['REMOTE_ADDR'] == $allow) {
+        $permit=1;
+    }
+}
+if($permit==0) {
+    die("Not allowed, get out");
+}
 switch ($action) {
     case 'getinvoice': {
         $invoice_data = localAPI('GetInvoice', array(
-            'invoiceid' => $invoiceid
+            'invoiceid' => intval($_GET['invoiceid'])
         ), $localapi_user);
-        // var_dump($invoice_data);
         if ($invoice_data['status'] === 'error') {
             print json_encode(array(
                 'status' => 'error',
@@ -75,6 +82,44 @@ switch ($action) {
             'idno' => get_customfield($client_data, $idno_customfieldid),
             'items' => $items
         ));
+    }
+    case 'payment': {
+        // invoiceid
+        // sum
+//         Техническая информация:
+//         - Запрос на сайт передаётся методом «GET»
+//         - Параметр «action» = «payment»
+//         - Параметр «invoiceid» = ID инвойса
+//         - Параметр «sum» = Сумма платежа
+        $postData = array(
+            'paymentmethod' => 'banktransfer',
+            'transid' => 'Transfer bancar '.date('d/m/Y H:i:s'),
+            'description' => 'from callback 1C',
+            'amountin' => round($_GET['sum'],3),
+            'invoiceid' => intval($_GET['invoiceid']),
+            'fees' => '0',
+            'rate' => '1.00000',
+        );
+
+        $results = localAPI('AddTransaction', $postData, $localapi_user);
+        $results['status'] = $results['result'];
+        print json_encode($results);
+    }
+    case 'setstatus': {
+//         Техническая информация:
+//         - Запрос на сайт передаётся методом «GET»
+//         - Параметр «action» = «setstatus»
+//         - Параметр «invoiceid» = ID инвойса
+//         - Параметр «status» = «pending»
+        $postData = array(
+            'invoiceid' => intval($_GET['invoiceid']),
+            'status' => 'Payment Pending',
+            'paymentmethod' => 'banktransfer',
+        );
+
+        $results = localAPI('UpdateInvoice', $postData, $localapi_user);
+        $results['status'] = $results['result'];
+        print json_encode($results);
     }
 }
 function get_customfield($client_array, $id) {
