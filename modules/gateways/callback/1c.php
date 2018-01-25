@@ -82,6 +82,7 @@ switch ($action) {
             'idno' => get_customfield($client_data, $idno_customfieldid),
             'items' => $items
         ));
+        break;
     }
     case 'payment': {
         // invoiceid
@@ -91,19 +92,31 @@ switch ($action) {
 //         - Параметр «action» = «payment»
 //         - Параметр «invoiceid» = ID инвойса
 //         - Параметр «sum» = Сумма платежа
+// number - id transfer din 1c
+// date - data transfer din 1c
+        $_GET['date_unix'] = strtotime($_GET['date']);
+        $_GET['sum'] = preg_replace('/[^\d,.]+/', '', $_GET['sum']);
+        $_GET['sum'] = round($_GET['sum'], 2);
+        
+        $postData = array(
+            'invoiceid' => intval($_GET['invoiceid']),
+        );
+        $results = localAPI('GetInvoice', $postData, $localapi_user);
+        
         $postData = array(
             'paymentmethod' => 'banktransfer',
-            'transid' => 'Transfer bancar '.date('d/m/Y H:i:s'),
+            'transid' => 'Transfer bancar '.$_GET['number'].' din data '.$_GET['date'],
             'description' => 'from callback 1C',
-            'amountin' => round($_GET['sum'],3),
+            'amountin' => $_GET['sum'],
             'invoiceid' => intval($_GET['invoiceid']),
+            'userid' => $results['userid'],
             'fees' => '0',
             'rate' => '1.00000',
         );
-
         $results = localAPI('AddTransaction', $postData, $localapi_user);
         $results['status'] = $results['result'];
         print json_encode($results);
+        break;
     }
     case 'setstatus': {
 //         Техническая информация:
@@ -120,6 +133,7 @@ switch ($action) {
         $results = localAPI('UpdateInvoice', $postData, $localapi_user);
         $results['status'] = $results['result'];
         print json_encode($results);
+        break;
     }
 }
 function get_customfield($client_array, $id) {
