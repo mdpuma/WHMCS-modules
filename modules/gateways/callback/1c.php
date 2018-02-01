@@ -96,6 +96,7 @@ switch ($action) {
 // date - data transfer din 1c
         $_GET['date_unix'] = strtotime($_GET['date']);
         $_GET['sum'] = preg_replace('/[^\d,.]+/', '', $_GET['sum']);
+        $_GET['sum'] = str_replace(',', '.', $_GET['sum']);
         $_GET['sum'] = round($_GET['sum'], 2);
         
         $postData = array(
@@ -110,6 +111,7 @@ switch ($action) {
             'amountin' => $_GET['sum'],
             'invoiceid' => intval($_GET['invoiceid']),
             'userid' => $results['userid'],
+            'date' => date("d.m.Y", $_GET['date_unix']),
             'fees' => '0',
             'rate' => '1.00000',
         );
