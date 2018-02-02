@@ -129,7 +129,7 @@ function bpaycardauto_link($params)
                 <order_id>" . $invoiceid . "</order_id>
                 <success_url>" . htmlspecialchars($params['success_url']) . "</success_url>
                 <fail_url>" . htmlspecialchars($params['fail_url']) . "</fail_url>
-                <callback_url>" . htmlspecialchars($systemurl . '/modules/gateways/callback/bpay.php') . "</callback_url>
+                <callback_url>" . htmlspecialchars($systemurl . '/modules/gateways/callback/bpaycardauto.php') . "</callback_url>
                 <lang>en</lang>
                 <advanced1>" . $email . "</advanced1>
                 <advanced2>" . $phone . "</advanced2>
