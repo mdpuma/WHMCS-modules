@@ -1,6 +1,6 @@
 <?php
 
-$signature = 'INUI7FGYu8bvts_wdw-tvT';
+$signature = '';
 
 $data = '<payment>
 <type>1.2</type>
@@ -19,7 +19,7 @@ $data = '<payment>
 $key = md5(md5($data) . md5($signature));
 
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, 'https://client.key.md/modules/gateways/callback/bpay.php');
+curl_setopt($ch, CURLOPT_URL, 'https://innovahosting.net/modules/gateways/callback/bpay.php');
 curl_setopt($ch, CURLOPT_POST, 1);
 curl_setopt($ch, CURLOPT_POSTFIELDS,
     http_build_query(
