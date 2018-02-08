@@ -17,6 +17,11 @@ if($permit==0) {
     die("Not allowed, get out");
 }
 switch ($action) {
+    case 'getcurrencies': {
+        $result = localAPI('GetCurrencies', array(), $localapi_user);
+        var_dump($result['currencies']['currency']);
+        break;
+    }
     case 'getinvoice': {
         $invoice_data = localAPI('GetInvoice', array(
             'invoiceid' => intval($_GET['invoiceid'])
@@ -102,7 +107,17 @@ switch ($action) {
         $postData = array(
             'invoiceid' => intval($_GET['invoiceid']),
         );
-        $results = localAPI('GetInvoice', $postData, $localapi_user);
+        $result1 = localAPI('GetInvoice', $postData, $localapi_user);
+        
+        $rate = 1;
+        $currencyid = 1;
+        $result2 = localAPI('GetCurrencies', array(), $localapi_user);
+        foreach($result2['currencies']['currency'] as $c) {
+            if($c['code']=='MDL') {
+                $rate = $c['rate'];
+                $currencyid = $c['id'];
+            }
+        }
         
         $postData = array(
             'paymentmethod' => 'banktransfer',
@@ -110,10 +125,11 @@ switch ($action) {
             'description' => 'from callback 1C',
             'amountin' => $_GET['sum'],
             'invoiceid' => intval($_GET['invoiceid']),
-            'userid' => $results['userid'],
+            'userid' => $result1['userid'],
             'date' => date("d.m.Y", $_GET['date_unix']),
             'fees' => '0',
-            'rate' => '1.00000',
+            'rate' => $rate,
+            'currencyid' => $currencyid,
         );
         $results = localAPI('AddTransaction', $postData, $localapi_user);
         $results['status'] = $results['result'];

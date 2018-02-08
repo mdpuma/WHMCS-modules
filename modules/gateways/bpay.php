@@ -43,7 +43,7 @@ function bpay_config()
             "FriendlyName" => "Bpay method",
             "Type" => "dropdown",
             "Options" => "bpay,card,card_eur,webmoneycat,wmrcat,bitcoin",
-            "Description" => "card - card mdl, card_eur - card euro, webmoneycat - webmoney wmz, wmrcat - webmoney wmr"
+            "Description" => "card - card mdl, card_eur - card euro, webmoneycat - webmoney wmz, wmrcat - webmoney wmr, bitcoin - bitcoin"
         ),
         "localapi_user" => array(
             "FriendlyName" => "Username for LocalAPI",
@@ -115,102 +115,5 @@ function bpay_link($params)
     
     return $code;
 }
-
-/*
-
-function bpay_capture($params) {
-
-# Gateway Specific Variables
-$gatewayusername = $params['username'];
-$gatewaytestmode = $params['testmode'];
-
-# Invoice Variables
-$invoiceid = $params['invoiceid'];
-$amount = $params['amount']; # Format: ##.##
-$currency = $params['currency']; # Currency Code
-
-# Client Variables
-$firstname = $params['clientdetails']['firstname'];
-$lastname = $params['clientdetails']['lastname'];
-$email = $params['clientdetails']['email'];
-$address1 = $params['clientdetails']['address1'];
-$address2 = $params['clientdetails']['address2'];
-$city = $params['clientdetails']['city'];
-$state = $params['clientdetails']['state'];
-$postcode = $params['clientdetails']['postcode'];
-$country = $params['clientdetails']['country'];
-$phone = $params['clientdetails']['phonenumber'];
-
-# Card Details
-$cardtype = $params['cardtype'];
-$cardnumber = $params['cardnum'];
-$cardexpiry = $params['cardexp']; # Format: MMYY
-$cardstart = $params['cardstart']; # Format: MMYY
-$cardissuenum = $params['cardissuenum'];
-
-# Perform Transaction Here & Generate $results Array, eg:
-$results = array();
-$results["status"] = "success";
-$results["transid"] = "12345";
-
-# Return Results
-if ($results["status"]=="success") {
-return array("status"=>"success","transid"=>$results["transid"],"rawdata"=>$results);
-} elseif ($gatewayresult=="declined") {
-return array("status"=>"declined","rawdata"=>$results);
-} else {
-return array("status"=>"error","rawdata"=>$results);
-}
-
-}
-*/
-
-/*
-function bpay_refund($params) {
-
-# Gateway Specific Variables
-$gatewayusername = $params['username'];
-$gatewaytestmode = $params['testmode'];
-
-# Invoice Variables
-$transid = $params['transid']; # Transaction ID of Original Payment
-$amount = $params['amount']; # Format: ##.##
-$currency = $params['currency']; # Currency Code
-
-# Client Variables
-$firstname = $params['clientdetails']['firstname'];
-$lastname = $params['clientdetails']['lastname'];
-$email = $params['clientdetails']['email'];
-$address1 = $params['clientdetails']['address1'];
-$address2 = $params['clientdetails']['address2'];
-$city = $params['clientdetails']['city'];
-$state = $params['clientdetails']['state'];
-$postcode = $params['clientdetails']['postcode'];
-$country = $params['clientdetails']['country'];
-$phone = $params['clientdetails']['phonenumber'];
-
-# Card Details
-$cardtype = $params['cardtype'];
-$cardnumber = $params['cardnum'];
-$cardexpiry = $params['cardexp']; # Format: MMYY
-$cardstart = $params['cardstart']; # Format: MMYY
-$cardissuenum = $params['cardissuenum'];
-
-# Perform Refund Here & Generate $results Array, eg:
-$results = array();
-$results["status"] = "success";
-$results["transid"] = "12345";
-
-# Return Results
-if ($results["status"]=="success") {
-return array("status"=>"success","transid"=>$results["transid"],"rawdata"=>$results);
-} elseif ($gatewayresult=="declined") {
-return array("status"=>"declined","rawdata"=>$results);
-} else {
-return array("status"=>"error","rawdata"=>$results);
-}
-
-}
-*/
 
 ?>
