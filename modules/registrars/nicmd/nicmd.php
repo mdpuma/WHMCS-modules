@@ -45,20 +45,18 @@ function nicmd_getConfigArray()
 
 function nicmd_GetNameservers($params)
 {
-    list($username, $password) = NicMD_Module_Helper::extractConfig($params);
+    list($username, $password, , $username2, $password2) = NicMD_Module_Helper::extractConfig($params);
 
     try {
         $client = new NicMD__Epp_Client($username, $password);
         $response = $client->request('<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<epp xmlns="urn:ietf:params:xml:ns:epp-1.0"
-     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-     xsi:schemaLocation="urn:ietf:params:xml:ns:epp-1.0 epp-1.0.xsd">
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:ietf:params:xml:ns:epp-1.0 epp-1.0.xsd">
   <command>
     <info>
-      <domain:info
-       xmlns:domain="urn:ietf:params:xml:ns:domain-1.0"
-       xsi:schemaLocation="urn:ietf:params:xml:ns:domain-1.0 domain-1.0.xsd">
-        <domain:name hosts="all">' . htmlspecialchars($params['sld'], ENT_QUOTES, 'UTF-8') . '</domain:name>
+      <domain:info xmlns:domain="urn:ietf:params:xml:ns:domain-1.0" xsi:schemaLocation="urn:ietf:params:xml:ns:domain-1.0 domain-1.0.xsd">
+        <domain:account>'.$username2.'</domain:account>
+        <domain:account_pw>'.$password2.'</domain:account_pw>
+        <domain:name>' . htmlspecialchars($params['sld'], ENT_QUOTES, 'UTF-8') . '</domain:name>
       </domain:info>
     </info>
     <clTRID>{clTRID}</clTRID>
@@ -133,14 +131,10 @@ function nicmd_RegisterDomain($params)
         $client = new NicMD__Epp_Client($username, $password);
 
         $response = $client->request('<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<epp xmlns="urn:ietf:params:xml:ns:epp-1.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="urn:ietf:params:xml:ns:epp-1.0 epp-1.0.xsd">
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:ietf:params:xml:ns:epp-1.0 epp-1.0.xsd">
   <command>
     <check>
-      <domain:check
-        xmlns:domain="urn:ietf:params:xml:ns:domain-1.0"
-        xsi:schemaLocation="urn:ietf:params:xml:ns:domain-1.0 domain-1.0.xsd">
+      <domain:check xmlns:domain="urn:ietf:params:xml:ns:domain-1.0" xsi:schemaLocation="urn:ietf:params:xml:ns:domain-1.0 domain-1.0.xsd">
         <domain:name>' . htmlspecialchars($params['sld'], ENT_QUOTES, 'UTF-8') . '</domain:name>
       </domain:check>
     </check>
