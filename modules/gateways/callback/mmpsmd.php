@@ -65,33 +65,32 @@ $num_rows = mysql_num_rows($result);
 
 if ($num_rows) {
 	if ($command == 'check') {
-		logTransaction($GATEWAY["name"], $_REQUEST['params'], "Transaction exists");
+		logTransaction($GATEWAY["name"], $_REQUEST, "Transaction exists");
 		echo '<?xml version="1.0" encoding="UTF-8"?><response><osmp_txn_id>' . $transid . '</osmp_txn_id><result>7</result><comment>Transaction already exists</comment></response>';
 		exit();
 	}
 	else {
-		logTransaction($GATEWAY["name"], $_REQUEST['params'], "Transaction exists");
-		echo '<?xml version="1.0" encoding="UTF-8"?><response><osmp_txn_id>' . $transid . '</osmp_txn_id><prv_txn>' . time() . '</prv_txn><sum>' . $amount . '</sum><result>0</result></response>';
+		logTransaction($GATEWAY["name"], $_REQUEST, "Transaction exists");
+		echo '<?xml version="1.0" encoding="UTF-8"?><response><osmp_txn_id>' . $transid . '</osmp_txn_id><result>7</result><comment>Transaction already exists</comment></response>';
 		exit();
 	}
 }
 
 if ($command == 'check') {
-	logTransaction($GATEWAY["name"], $_REQUEST['params'], "Transaction check");
-	echo '<?xml version="1.0" encoding="UTF-8"?><response><osmp_txn_id>' . $transid . '</osmp_txn_id><result>0</result><fields><field1 name="Amount">' . $total_converted . '</field1><field2 name="You pay">' . $sum . '</field2><field3 name="User">' . $userdata['firstname'] . ' ' . $userdata['lastname'] . '</field3><field4 name="Email">' . $userdata['email'] . '</field4></fields></response>';
+	logTransaction($GATEWAY["name"], $_REQUEST, "Transaction check");
+	echo '<?xml version="1.0" encoding="UTF-8"?><response><osmp_txn_id>' . $transid . '</osmp_txn_id><result>0</result></response>';
 	exit();
-}
-elseif ($command == 'pay') {
+} elseif ($command == 'pay') {
 	if ($total < $amount + 1 && $amount - 1 < $total) {
 		$amount = $total;
-	};
+	}
 	if ($amount == 0) {
-		logTransaction($GATEWAY["name"], $POST, "Zero Payment");
+		logTransaction($GATEWAY["name"], $_REQUEST, "Zero Payment");
 		echo '<?xml version="1.0" encoding="UTF-8"?><response><osmp_txn_id>' . $transid . '</osmp_txn_id><result>7</result><comment>Zero payment</comment></response>';
 		exit();
 	};
 	addInvoicePayment($invoiceid, $transid, $amount, 0, $gatewaymodule);
-	logTransaction($GATEWAY["name"], $_REQUEST['params'], "Successful");
+	logTransaction($GATEWAY["name"], $_REQUEST, "Successful");
 	echo '<?xml version="1.0" encoding="UTF-8"?><response><osmp_txn_id>' . $transid . '</osmp_txn_id><prv_txn>' . time() . '</prv_txn><sum>' . $amount . '</sum><result>0</result></response>';
 	exit;
 }
