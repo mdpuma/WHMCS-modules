@@ -78,7 +78,7 @@ if ($num_rows) {
 
 if ($command == 'check') {
 	logTransaction($GATEWAY["name"], $_REQUEST, "Transaction check");
-	echo '<?xml version="1.0" encoding="UTF-8"?><response><osmp_txn_id>' . $transid . '</osmp_txn_id><result>0</result></response>';
+	echo '<?xml version="1.0" encoding="UTF-8"?><response><osmp_txn_id>' . $transid . '</osmp_txn_id><sum>' . $total_converted . '</sum><result>0</result></response>';
 	exit();
 } elseif ($command == 'pay') {
 	if ($total < $amount + 1 && $amount - 1 < $total) {
