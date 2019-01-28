@@ -6,6 +6,7 @@ class nicmdEppClient {
 	private $pass = null;
 	private $is_logged = false;
 	private $debug = false;
+	private $dialog = [];
 	
 	public $contact_attributes = array (
 			'org_name',
@@ -55,9 +56,10 @@ class nicmdEppClient {
 			'ren_date'
 		);
 	
-	function __construct($host, $port=700, $user, $pass) {
+	function __construct($host, $port=700, $user, $pass, $debug=0) {
 		$this->user=$user;
 		$this->pass=$pass;
+		$this->debug=(bool)$debug;
 		
 		$this->connection = stream_socket_client('tls://'.$host.':'.$port, $errno, $errstr, 60, STREAM_CLIENT_CONNECT, stream_context_create( array( 'ssl' => array( 'verify_peer' => false, 'verify_peer_name' => false, 'allow_self_signed' => true ) ) ));
 		return $this->connection;
@@ -66,6 +68,16 @@ class nicmdEppClient {
 	public function login($epp_user, $epp_pass) {
 		$i = 0;
 		$result = '';
+		
+		if(empty($epp_user)) {
+			$epp_result['error'] = 'Empty epp_user';
+			return $epp_result;
+		}
+		if(empty($epp_pass)) {
+			$epp_result['error'] = 'Empty epp_pass';
+			return $epp_result;
+		}
+		
 		while (!feof($this->connection)) {
 			$i++;
 			$result .= fgetc($this->connection);
@@ -95,16 +107,15 @@ class nicmdEppClient {
 				} else {
 					$epp_result['error'] = 'Error!';
 				}
-				return $epp_result;
 			} else {
 				$this->is_logged=true;
-				return $this->connection;
+				$epp_result['result'] = 'success';
 			}
 		} else {
 			$epp_result['result'] = 0;
 			$epp_result['error'] = 'Error!';
-			return $epp_result;
 		}
+		return $epp_result;
 	}
 	
 	public function logout() {
@@ -161,7 +172,15 @@ class nicmdEppClient {
 			echo "===\nSENT:\n\n$xml\n\n\n===\n";
 			echo "===\nRECEIVED:\n\n$result\n\n\n===\n";
 		}
+		$this->dialog[] = array(
+			'request'=> $xml,
+			'response' => $result
+		);
 		return $result;
+	}
+	
+	public function get_dialog() {
+		return $this->dialog;
 	}
 	
 	public function registerDomain($domain, $reg_period, $contacts, $nameservers) {
@@ -409,7 +428,9 @@ class nicmdEppClient {
 				$epp_result['error'] = 'Error!';
 			}
 		} else {
-			if (strstr($result,'domain:name res="0"')) {
+			if(preg_match("/<domain:name res=\"0\">(.+)<\/domain:name>/",$result,$msg)) {
+				$epp_result['error'] = 'Error: '.$msg[1];
+			} elseif (strstr($result,'domain:name res="0"')) {
 				$epp_result['error'] = 'Error: domain not exists';
 			} elseif (strstr($result,'domain:name res="2"')) {
 				$epp_result['error'] = 'Error: domain not in account';
@@ -460,6 +481,12 @@ class nicmdEppClient {
 						'Country' => $epp_info['bil_country'],
 						'Phone' => $epp_info['bil_phone'],
 					),
+					'Domain' => array(
+						'Registration Date' => $epp_info['reg_date'],
+						'Expiration Date' => $epp_info['exp_date'],
+						'Renew Date' => $epp_info['ren_date'],
+						'Domain Name' => $domain,
+					)
 				);
 			}
 		}
@@ -481,37 +508,37 @@ class nicmdEppClient {
 							<domain:account_pw>'.$this->pass.'</domain:account_pw>
 							<domain:name>'.$domain.'</domain:name>
 
-							<domain:org_name>'.$contacts['contactdetails']['Administrative']['Company Name'].'</domain:org_name>
+							<domain:org_name>'.$contacts['Administrative']['Company Name'].'</domain:org_name>
 
-							<domain:adm_firstname>'.$contacts['contactdetails']['Administrative']['First Name'].'</domain:adm_firstname>
-							<domain:adm_lastname>'.$contacts['contactdetails']['Administrative']['Last Name'].'</domain:adm_lastname>
-							<domain:adm_str>'.$contacts['contactdetails']['Administrative']['Address'].'</domain:adm_str>
-							<domain:adm_city>'.$contacts['contactdetails']['Administrative']['City'].'</domain:adm_city>
-							<domain:adm_postc>'.$contacts['contactdetails']['Administrative']['Postcode'].'</domain:adm_postc>
-							<domain:adm_country>'.$contacts['contactdetails']['Administrative']['Country'].'</domain:adm_country>
-							<domain:adm_phone>'.$contacts['contactdetails']['Administrative']['Phone'].'</domain:adm_phone>
-							<domain:adm_email>'.$contacts['contactdetails']['Administrative']['Email'].'</domain:adm_email>
-							<domain:adm_state>'.$contacts['contactdetails']['Administrative']['State'].'</domain:adm_state>
+							<domain:adm_firstname>'.$contacts['Administrative']['First Name'].'</domain:adm_firstname>
+							<domain:adm_lastname>'.$contacts['Administrative']['Last Name'].'</domain:adm_lastname>
+							<domain:adm_str>'.$contacts['Administrative']['Address'].'</domain:adm_str>
+							<domain:adm_city>'.$contacts['Administrative']['City'].'</domain:adm_city>
+							<domain:adm_postc>'.$contacts['Administrative']['Postcode'].'</domain:adm_postc>
+							<domain:adm_country>'.$contacts['Administrative']['Country'].'</domain:adm_country>
+							<domain:adm_phone>'.$contacts['Administrative']['Phone'].'</domain:adm_phone>
+							<domain:adm_email>'.$contacts['Administrative']['Email'].'</domain:adm_email>
+							<domain:adm_state>'.$contacts['Administrative']['State'].'</domain:adm_state>
 
-							<domain:teh_firstname>'.$contacts['contactdetails']['Technical']['First Name'].'</domain:teh_firstname>
-							<domain:teh_lastname>'.$contacts['contactdetails']['Technical']['Last Name'].'</domain:teh_lastname>
-							<domain:teh_str>'.$contacts['contactdetails']['Technical']['Address'].'</domain:teh_str>
-							<domain:teh_city>'.$contacts['contactdetails']['Technical']['City'].'</domain:teh_city>
-							<domain:teh_postc>'.$contacts['contactdetails']['Technical']['Postcode'].'</domain:teh_postc>
-							<domain:teh_country>'.$contacts['contactdetails']['Technical']['Country'].'</domain:teh_country>
-							<domain:teh_phone>'.$contacts['contactdetails']['Technical']['Phone'].'</domain:teh_phone>
-							<domain:teh_email>'.$contacts['contactdetails']['Technical']['Email'].'</domain:teh_email>
-							<domain:teh_state>'.$contacts['contactdetails']['Technical']['State'].'</domain:teh_state>
+							<domain:teh_firstname>'.$contacts['Technical']['First Name'].'</domain:teh_firstname>
+							<domain:teh_lastname>'.$contacts['Technical']['Last Name'].'</domain:teh_lastname>
+							<domain:teh_str>'.$contacts['Technical']['Address'].'</domain:teh_str>
+							<domain:teh_city>'.$contacts['Technical']['City'].'</domain:teh_city>
+							<domain:teh_postc>'.$contacts['Technical']['Postcode'].'</domain:teh_postc>
+							<domain:teh_country>'.$contacts['Technical']['Country'].'</domain:teh_country>
+							<domain:teh_phone>'.$contacts['Technical']['Phone'].'</domain:teh_phone>
+							<domain:teh_email>'.$contacts['Technical']['Email'].'</domain:teh_email>
+							<domain:teh_state>'.$contacts['Technical']['State'].'</domain:teh_state>
 
-							<domain:bil_firstname>'.$contacts['contactdetails']['Billing']['First Name'].'</domain:bil_firstname>
-							<domain:bil_lastname>'.$contacts['contactdetails']['Billing']['Last Name'].'</domain:bil_lastname>
-							<domain:bil_str>'.$contacts['contactdetails']['Billing']['Address'].'</domain:bil_str>
-							<domain:bil_city>'.$contacts['contactdetails']['Billing']['City'].'</domain:bil_city>
-							<domain:bil_postc>'.$contacts['contactdetails']['Billing']['Postcode'].'</domain:bil_postc>
-							<domain:bil_country>'.$contacts['contactdetails']['Billing']['Country'].'</domain:bil_country>
-							<domain:bil_phone>'.$contacts['contactdetails']['Billing']['Phone'].'</domain:bil_phone>
-							<domain:bil_email>'.$contacts['contactdetails']['Billing']['Email'].'</domain:bil_email>
-							<domain:bil_state>'.$contacts['contactdetails']['Billing']['State'].'</domain:bil_state>
+							<domain:bil_firstname>'.$contacts['Billing']['First Name'].'</domain:bil_firstname>
+							<domain:bil_lastname>'.$contacts['Billing']['Last Name'].'</domain:bil_lastname>
+							<domain:bil_str>'.$contacts['Billing']['Address'].'</domain:bil_str>
+							<domain:bil_city>'.$contacts['Billing']['City'].'</domain:bil_city>
+							<domain:bil_postc>'.$contacts['Billing']['Postcode'].'</domain:bil_postc>
+							<domain:bil_country>'.$contacts['Billing']['Country'].'</domain:bil_country>
+							<domain:bil_phone>'.$contacts['Billing']['Phone'].'</domain:bil_phone>
+							<domain:bil_email>'.$contacts['Billing']['Email'].'</domain:bil_email>
+							<domain:bil_state>'.$contacts['Billing']['State'].'</domain:bil_state>
 						</domain:update>
 					</update>
 					<clTRID>'.rand(10000,99999).'</clTRID>
