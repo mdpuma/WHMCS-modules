@@ -166,7 +166,13 @@ function molddata_RegisterDomain($params) {
 	$epp_result = $epp->registerDomain($params['sld'], $params['regperiod'], $contacts, $nameservers);
 	$epp->logout();
 
+<<<<<<< HEAD
 	molddata_DebugLog('register', $params, $epp);
+	
+	molddata_writeSqlLog('register', $params['domainid'], $nameservers, $params);
+=======
+	molddata_DebugLog($params, $epp);
+>>>>>>> 674abdd0bfa0465eec802754975b64dc85dc563f
 	
 	molddata_writeSqlLog('register', $params['domainid'], $nameservers, $params);
 	
@@ -187,7 +193,11 @@ function molddata_RenewDomain($params) {
 
 	$epp->logout();
 
+<<<<<<< HEAD
 	molddata_DebugLog('renew', $params, $epp);
+=======
+	molddata_DebugLog($params, $epp);
+>>>>>>> 674abdd0bfa0465eec802754975b64dc85dc563f
 	
 	molddata_writeSqlLog('renew', $params['domainid'], '', $params);
 
@@ -203,7 +213,11 @@ function molddata_GetNameservers($params) {
 
 	$epp->logout();
 
+<<<<<<< HEAD
 	if ($params['write_log_info'] == 'on') molddata_DebugLog('getnameservers', $params, $epp);
+=======
+	if ($params['write_log_info'] == 'on') molddata_DebugLog($params, $epp);
+>>>>>>> 674abdd0bfa0465eec802754975b64dc85dc563f
 
 	return $epp_result;
 }
@@ -222,7 +236,11 @@ function molddata_SaveNameservers($params) {
 
 	$epp->logout();
 
+<<<<<<< HEAD
 	molddata_DebugLog('savenameservers', $params, $epp);
+=======
+	molddata_DebugLog($params, $epp);
+>>>>>>> 674abdd0bfa0465eec802754975b64dc85dc563f
 	
 	molddata_writeSqlLog('savenameservers', $params['domainid'], $nameservers, '');
 
@@ -299,8 +317,15 @@ function molddata_Sync($params) {
 	}
 
 	$epp->logout();
+<<<<<<< HEAD
 	
 	molddata_DebugLog('domainsync', $params, $epp);
+=======
+
+	logModuleCall('molddata', 'domainsync', $epp_result, $result);
+
+	molddata_DebugLog($params, $epp);
+>>>>>>> 674abdd0bfa0465eec802754975b64dc85dc563f
 
 	return $result;
 }
@@ -313,7 +338,11 @@ function molddata_GetContactDetails($params) {
 	unset($epp_result['Domain']);
 	// 	echo '<textarea>'.$epp->get_dialog().'</textarea>';
 	$epp->logout();
+<<<<<<< HEAD
 	molddata_DebugLog('getcontactdetails', $params, $epp);
+=======
+	molddata_DebugLog($params, $epp);
+>>>>>>> 674abdd0bfa0465eec802754975b64dc85dc563f
 
 	return $epp_result;
 }
@@ -354,7 +383,11 @@ function molddata_SaveContactDetails($params) {
 	$epp_result = $epp->saveContactDetails($params['sld'], $params['contactdetails']);
 	$epp->logout();
 
+<<<<<<< HEAD
 	molddata_DebugLog('savecontactdetails', $params, $epp);
+=======
+	molddata_DebugLog($params, $epp);
+>>>>>>> 674abdd0bfa0465eec802754975b64dc85dc563f
 	
 	molddata_writeSqlLog('savecontactdetails', $params['domainid'], '', array_merge($params['contactdetails'], $params['original']));
 
@@ -364,14 +397,22 @@ function molddata_SaveContactDetails($params) {
 	return 'Successful';
 }
 
+<<<<<<< HEAD
 function molddata_DebugLog($action, $params, $epp) {
+=======
+function molddata_DebugLog($params, $epp) {
+>>>>>>> 674abdd0bfa0465eec802754975b64dc85dc563f
 	if ($params['write_log'] !== 'on') {
 		return false;
 	}
 	$result = $epp->get_dialog();
 
 	foreach ($result as $i) {
+<<<<<<< HEAD
 		logModuleCall('molddata', $action, $i['request'], $i['response']);
+=======
+		logModuleCall('molddata', 'command', $i['request'], $i['response']);
+>>>>>>> 674abdd0bfa0465eec802754975b64dc85dc563f
 	}
 }
 
