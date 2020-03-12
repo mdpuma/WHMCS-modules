@@ -187,6 +187,7 @@ function molddata_RenewDomain($params) {
 	$epp->logout();
 	
 	molddata_DebugLog('renew', $params, $epp);
+	logModuleCall('molddata', 'renew-result', $epp_result, '');
 	molddata_writeSqlLog('renew', $params['domainid'], '', $params);
 
 	return $epp_result;
@@ -389,6 +390,7 @@ function molddata_writeSqlLog($action, $domainid, $nameservers = array(), $add =
 			':additional' => $add,
 			':time' => date('U')
 		]);
+		$pdo->commit();
 	}
 	catch(\Exception $e) {
 		die( "Uh oh! {$e->getMessage() }");
