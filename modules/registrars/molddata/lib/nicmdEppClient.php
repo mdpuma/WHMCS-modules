@@ -279,13 +279,18 @@ class nicmdEppClient {
 		$result = $this->_epp_send($xml);
 		if (!strstr ($result, '<result code="1000">')) {
 			if (preg_match("/<msg>(.+)<\/msg>/",$result,$msg)) {
-				$epp_result['error'] = 'Error: '.$msg[0];
+				$epp_result['error'] = 'Error: '.$msg[1];
 			} else {
 				$epp_result['error'] = 'Error!';
 			}
 		} else {
 			if (strstr($result,'domain:name res="0"')) {
-				$epp_result['error'] = 'Error: domain not in account';
+				//  <domain:name res="0">depozit insuficient</domain:name>
+				if (preg_match("/<domain:name res=\"0\">(.+)<\/domain:name>/",$result,$msg)) {
+					$epp_result['error'] = 'Error: '.$msg[1];
+				} else {
+					$epp_result['error'] = 'Error: unknown cause';
+				}
 			} elseif (strstr($result,'domain:name res="2"')) {
 				$epp_result['error'] = 'Error: fail current expiration date';
 			} else {
