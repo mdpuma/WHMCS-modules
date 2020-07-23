@@ -20,7 +20,7 @@ while ($cdata = mysql_fetch_array($cresult)) {
     $rate = $cdata['rate'];
 
     # Loop Through Products
-    $result = full_query("SELECT packageid, COUNT(*), SUM(amount), billingcycle FROM tblhosting INNER JOIN tblclients ON tblclients.id = tblhosting.userid WHERE tblclients.currency = ".(int)$currencyid." AND domainstatus='Active' GROUP BY tblhosting.packageid,billingcycle");
+    $result = full_query("SELECT packageid, COUNT(*), SUM(amount), billingcycle FROM tblhosting INNER JOIN tblclients ON tblclients.id = tblhosting.userid WHERE tblclients.currency = ".(int)$currencyid." AND ( domainstatus='Active' OR domainstatus='Suspended' ) GROUP BY tblhosting.packageid,billingcycle");
     while ($data = mysql_fetch_array($result)) {
 		$billingcycles = array("Monthly", "Quarterly", "Semi-Annually", "Annually", "Biennially", "Triennially");
 		$billingcycle = $data[3];
@@ -28,12 +28,9 @@ while ($cdata = mysql_fetch_array($cresult)) {
 			$products[$data[0]][$billingcycle] += $data[2]/$rate;
 		}
         $products[$data[0]]['unitssold'] += $data[1];
-        if($data[0]==231) {
-			print_r($products[$data[0]]);
-        }
     }
     # Loop Through Addons
-    $result = full_query("SELECT addonid as packageid, COUNT(*), SUM(recurring) as amount, billingcycle FROM tblhostingaddons INNER JOIN tblclients ON tblclients.id = tblhostingaddons.userid WHERE tblclients.currency = ".(int)$currencyid." AND tblhostingaddons.status='Active' GROUP BY tblhostingaddons.addonid,billingcycle");
+    $result = full_query("SELECT addonid as packageid, COUNT(*), SUM(recurring) as amount, billingcycle FROM tblhostingaddons INNER JOIN tblclients ON tblclients.id = tblhostingaddons.userid WHERE tblclients.currency = ".(int)$currencyid." AND ( tblhostingaddons.status='Active' OR tblhostingaddons.status='Suspended' ) GROUP BY tblhostingaddons.addonid,billingcycle");
 	while ($data = mysql_fetch_array($result)) {
 		$billingcycles = array("Monthly", "Quarterly", "Semi-Annually", "Annually", "Biennially", "Triennially");
 		$billingcycle = $data[3];
