@@ -17,7 +17,7 @@ $amount = $_REQUEST['sum']; // amount in MDL from provider
 $command = $_REQUEST['command'];
 
 if (!in_array($remote_ip, $ips)) {
-	echo '<?xml version="1.0" encoding="UTF-8"?><response><osmp_txn_id>' . $transid . '</osmp_txn_id><result>1</result><comment>Access denied</comment></response>';
+	echo '<?xml version="1.0" encoding="UTF-8"?><response><osmp_txn_id>' . $transid . '</osmp_txn_id><result>001</result><comment>Access denied</comment></response>';
 	exit();
 }
 
@@ -28,18 +28,18 @@ $postData = array(
 $invoice_data = localAPI('GetInvoice', $postData);
 
 if ($invoice_data['result'] !== 'success') {
-	echo '<?xml version="1.0" encoding="UTF-8"?><response><osmp_txn_id>' . $transid . '</osmp_txn_id><result>5</result><comment>Invoice ID not found</comment></response>';
+	echo '<?xml version="1.0" encoding="UTF-8"?><response><osmp_txn_id>' . $transid . '</osmp_txn_id><result>004</result><comment>Invoice ID not found</comment></response>';
 	exit();
 }
 
 if (!$transid) {
-	echo '<?xml version="1.0" encoding="UTF-8"?><response><osmp_txn_id>' . $transid . '</osmp_txn_id><result>7</result><comment>Transaction not set</comment></response>';
+	echo '<?xml version="1.0" encoding="UTF-8"?><response><osmp_txn_id>' . $transid . '</osmp_txn_id><result>003</result><comment>Transaction not set</comment></response>';
 	exit();
 }
 
 if ($invoice_data['status'] == 'Paid') {
 	logTransaction($GATEWAY["name"], $_REQUEST, "Invoice is already paid");
-	echo '<?xml version="1.0" encoding="UTF-8"?><response><osmp_txn_id>' . $transid . '</osmp_txn_id><result>7</result><comment>Invoice is already paid</comment></response>';
+	echo '<?xml version="1.0" encoding="UTF-8"?><response><osmp_txn_id>' . $transid . '</osmp_txn_id><result>333</result><comment>Invoice is already paid</comment></response>';
 	exit();
 }
 
@@ -60,7 +60,7 @@ $transactions_data = localAPI('GetTransactions', $postData);
 foreach($transactions_data['transactions'] as $i) {
 	if($i['transid'] == $transid) {
 		logTransaction($GATEWAY["name"], $_REQUEST, "Transaction exists");
-		echo '<?xml version="1.0" encoding="UTF-8"?><response><osmp_txn_id>' . $transid . '</osmp_txn_id><result>7</result><comment>Transaction already exists</comment></response>';
+		echo '<?xml version="1.0" encoding="UTF-8"?><response><osmp_txn_id>' . $transid . '</osmp_txn_id><result>333</result><comment>Transaction already exists</comment></response>';
 		exit();
 	}
 }
@@ -99,7 +99,7 @@ switch($command) {
 		
 		if ($converted_amount == 0) {
 			logTransaction($GATEWAY["name"], $_REQUEST, "Zero Payment");
-			echo '<?xml version="1.0" encoding="UTF-8"?><response><osmp_txn_id>' . $transid . '</osmp_txn_id><result>7</result><comment>Zero payment</comment></response>';
+			echo '<?xml version="1.0" encoding="UTF-8"?><response><osmp_txn_id>' . $transid . '</osmp_txn_id><result>007</result><comment>Zero payment</comment></response>';
 			exit();
 		};
 		
@@ -113,12 +113,12 @@ switch($command) {
 		$results = localAPI('AddInvoicePayment', $postData);
 		
 		logTransaction($GATEWAY["name"], $_REQUEST, "Successful");
-		echo '<?xml version="1.0" encoding="UTF-8"?><response><osmp_txn_id>' . $transid . '</osmp_txn_id><prv_txn>'.$invoiceid.'-' . time() . '</prv_txn><sum>' . $amount . '</sum><result>0</result></response>';
+		echo '<?xml version="1.0" encoding="UTF-8"?><response><osmp_txn_id>' . $transid . '</osmp_txn_id><prv_txn>'.$invoiceid.'-' . time() . '</prv_txn><sum>' . $amount . '</sum><result>000</result></response>';
 		exit;
 		break;
 	}
 	default: {
-		echo '<?xml version="1.0" encoding="UTF-8"?><response><osmp_txn_id>' . $transid . '</osmp_txn_id><result>7</result><comment>Unknown action</comment></response>';
+		echo '<?xml version="1.0" encoding="UTF-8"?><response><osmp_txn_id>' . $transid . '</osmp_txn_id><result>300</result><comment>Unknown action</comment></response>';
 		break;
 	}
 	
