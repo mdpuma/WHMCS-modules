@@ -121,6 +121,10 @@ function molddata_getConfigArray() {
 
 // ############################################################################################################
 function molddata_RegisterDomain($params) {
+	if($params['tld'] !== 'md') {
+		return array('error' => "Cant register domain with different tld than .md");
+	}
+	
 	$epp = new nicmdEppClient($params['EPPHost'], $params['EPPPort'], $params['Login'], $params['Password']); // last argument debug=1
 	$epp->login($params['EPPUser'], $params['EPPPassword']);
 
@@ -174,6 +178,10 @@ function molddata_RegisterDomain($params) {
 
 // ############################################################################################################
 function molddata_RenewDomain($params) {
+	if($params['tld'] !== 'md') {
+		return array('error' => "Cant renew domain with different tld than .md");
+	}
+	
 	$rdata = Capsule::table('tbldomains')->where('id', $params['domainid'])->first();
 	if ($rdata) {
 		$domainExpDate = $rdata->expirydate;
@@ -195,6 +203,10 @@ function molddata_RenewDomain($params) {
 
 // ############################################################################################################
 function molddata_GetNameservers($params) {
+	if($params['tld'] !== 'md') {
+		return array('error' => "Cant get domain info for this domain");
+	}
+	
 	$epp = new nicmdEppClient($params['EPPHost'], $params['EPPPort'], $params['Login'], $params['Password']); // last argument debug=1
 	$epp->login($params['EPPUser'], $params['EPPPassword']);
 
@@ -208,6 +220,10 @@ function molddata_GetNameservers($params) {
 
 // ############################################################################################################
 function molddata_SaveNameservers($params) {
+	if($params['tld'] !== 'md') {
+		return array('error' => "Cant manage contactDetails for domain which aren't .md");
+	}
+	
 	$epp = new nicmdEppClient($params['EPPHost'], $params['EPPPort'], $params['Login'], $params['Password']); // last argument debug=1
 	$epp->login($params['EPPUser'], $params['EPPPassword']);
 
@@ -302,6 +318,10 @@ function molddata_Sync($params) {
 
 // ############################################################################################################
 function molddata_GetContactDetails($params) {
+	if($params['tld'] !== 'md') {
+		return array('error' => "Cant manage contactDetails for domain which aren't .md");
+	}
+	
 	$epp = new nicmdEppClient($params['EPPHost'], $params['EPPPort'], $params['Login'], $params['Password']); // last argument debug=1
 	$res = $epp->login($params['EPPUser'], $params['EPPPassword']);
 	$epp_result = $epp->getContactDetails($params['sld']);
@@ -315,6 +335,10 @@ function molddata_GetContactDetails($params) {
 
 // ############################################################################################################
 function molddata_SaveContactDetails($params) {
+	if($params['tld'] !== 'md') {
+		return array('error' => "Cant manage contactDetails for domain which aren't .md");
+	}
+	
 	$epp = new nicmdEppClient($params['EPPHost'], $params['EPPPort'], $params['Login'], $params['Password']); // last argument debug=1
 	$res = $epp->login($params['EPPUser'], $params['EPPPassword']);
 
