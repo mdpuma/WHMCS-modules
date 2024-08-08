@@ -141,8 +141,8 @@ function molddata_RegisterDomain($params) {
 		'adm_country' => $params['countrycode'],
 		'adm_phone' => $params['phonenumber'],
 		'adm_email' => $params['email'],
-        'adm_type' => (!empty($params['company']) ? 'organization' : 'individual'),
-        //'adm_taxid' => $params['def_taxid'],
+        'adm_type' => $params['additionalfields']['Entity Type'],
+        'adm_taxid' => $params['additionalfields']['IDNO'],
         'adm_orgname' => $params['company'],
 
 		'teh_firstname' => $params['def_firstname'],
