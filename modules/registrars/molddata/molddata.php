@@ -91,12 +91,6 @@ function molddata_getConfigArray() {
 			"Size" => "40",
 			"Description" => "City for billing and technical"
 		) ,
-		"def_state" => array(
-			'FriendlyName' => 'Default State',
-			"Type" => "text",
-			"Size" => "40",
-			"Description" => "State for billing and technical"
-		) ,
 		"def_postcode" => array(
 			'FriendlyName' => 'Default Postcode',
 			"Type" => "text",
@@ -115,16 +109,24 @@ function molddata_getConfigArray() {
 			"Size" => "40",
 			"Description" => "Phone for billing and technical"
 		) ,
+        "def_orgname" => array(
+			'FriendlyName' => 'Default Organisation name',
+			"Type" => "text",
+			"Size" => "40",
+			"Description" => "OrgName for billing and technical"
+		) ,
+        "def_taxid" => array(
+			'FriendlyName' => 'Default IDNO',
+			"Type" => "text",
+			"Size" => "40",
+			"Description" => "IDNO for billing and technical"
+		) ,
 	);
 	return $configarray;
 }
 
 // ############################################################################################################
 function molddata_RegisterDomain($params) {
-	if($params['tld'] !== 'md') {
-		return array('error' => "Cant register domain with different tld than .md");
-	}
-	
 	$epp = new nicmdEppClient($params['EPPHost'], $params['EPPPort'], $params['Login'], $params['Password']); // last argument debug=1
 	$epp->login($params['EPPUser'], $params['EPPPassword']);
 
@@ -136,30 +138,35 @@ function molddata_RegisterDomain($params) {
 		'adm_str' => $params['address1'],
 		'adm_city' => $params['city'],
 		'adm_postc' => $params['postcode'],
-		'adm_state' => $params['state'],
 		'adm_country' => $params['countrycode'],
 		'adm_phone' => $params['phonenumber'],
 		'adm_email' => $params['email'],
+        'adm_type' => (!empty($params['company']) ? 'organization' : 'individual'),
+        //'adm_taxid' => $params['def_taxid'],
+        'adm_orgname' => $params['company'],
 
 		'teh_firstname' => $params['def_firstname'],
 		'teh_lastname' => $params['def_lastname'],
 		'teh_str' => $params['def_address1'],
 		'teh_city' => $params['def_city'],
 		'teh_postc' => $params['def_postcode'],
-		'teh_state' => $params['def_state'],
 		'teh_country' => $params['def_countrycode'],
-		'teh_phone' => $params['def_phonenumber'],
+		'teh_phone' => $params['def_phone'],
 		'teh_email' => $params['def_email'],
+        'teh_type' => 'organization',
+        'teh_orgname' => $params['def_orgname'],
 
 		'bil_firstname' => $params['def_firstname'],
 		'bil_lastname' => $params['def_lastname'],
 		'bil_str' => $params['def_address1'],
 		'bil_city' => $params['def_city'],
 		'bil_postc' => $params['def_postcode'],
-		'bil_state' => $params['def_state'],
 		'bil_country' => $params['def_countrycode'],
-		'bil_phone' => $params['def_phonenumber'],
+		'bil_phone' => $params['def_phone'],
 		'bil_email' => $params['def_email'],
+        'bil_type' => 'organization',
+        'bil_orgname' => $params['def_orgname'],
+        'bil_taxid' => $params['def_taxid'],
 	);
 
 	$nameservers = array(
@@ -178,10 +185,6 @@ function molddata_RegisterDomain($params) {
 
 // ############################################################################################################
 function molddata_RenewDomain($params) {
-	if($params['tld'] !== 'md') {
-		return array('error' => "Cant renew domain with different tld than .md");
-	}
-	
 	$rdata = Capsule::table('tbldomains')->where('id', $params['domainid'])->first();
 	if ($rdata) {
 		$domainExpDate = $rdata->expirydate;
@@ -203,10 +206,6 @@ function molddata_RenewDomain($params) {
 
 // ############################################################################################################
 function molddata_GetNameservers($params) {
-	if($params['tld'] !== 'md') {
-		return array('error' => "Cant get domain info for this domain");
-	}
-	
 	$epp = new nicmdEppClient($params['EPPHost'], $params['EPPPort'], $params['Login'], $params['Password']); // last argument debug=1
 	$epp->login($params['EPPUser'], $params['EPPPassword']);
 
@@ -220,10 +219,6 @@ function molddata_GetNameservers($params) {
 
 // ############################################################################################################
 function molddata_SaveNameservers($params) {
-	if($params['tld'] !== 'md') {
-		return array('error' => "Cant manage contactDetails for domain which aren't .md");
-	}
-	
 	$epp = new nicmdEppClient($params['EPPHost'], $params['EPPPort'], $params['Login'], $params['Password']); // last argument debug=1
 	$epp->login($params['EPPUser'], $params['EPPPassword']);
 
@@ -318,10 +313,6 @@ function molddata_Sync($params) {
 
 // ############################################################################################################
 function molddata_GetContactDetails($params) {
-	if($params['tld'] !== 'md') {
-		return array('error' => "Cant manage contactDetails for domain which aren't .md");
-	}
-	
 	$epp = new nicmdEppClient($params['EPPHost'], $params['EPPPort'], $params['Login'], $params['Password']); // last argument debug=1
 	$res = $epp->login($params['EPPUser'], $params['EPPPassword']);
 	$epp_result = $epp->getContactDetails($params['sld']);
@@ -335,12 +326,14 @@ function molddata_GetContactDetails($params) {
 
 // ############################################################################################################
 function molddata_SaveContactDetails($params) {
-	if($params['tld'] !== 'md') {
-		return array('error' => "Cant manage contactDetails for domain which aren't .md");
-	}
-	
 	$epp = new nicmdEppClient($params['EPPHost'], $params['EPPPort'], $params['Login'], $params['Password']); // last argument debug=1
 	$res = $epp->login($params['EPPUser'], $params['EPPPassword']);
+
+    if(empty($params['companyname'])) {
+        $params['contactdetails']['Administrative']['Type'] = 'individual';
+    } else {
+        $params['contactdetails']['Administrative']['Type'] = 'organization';
+    }
 
 	if ($params['force_def_contact'] == 'on') {
 		$default_contact = array(
@@ -350,10 +343,11 @@ function molddata_SaveContactDetails($params) {
 				'Email' => $params['def_email'],
 				'Address' => $params['def_address1'],
 				'City' => $params['def_city'],
-				'State' => $params['def_state'],
 				'Postcode' => $params['def_postcode'],
 				'Country' => $params['def_country'],
 				'Phone' => $params['def_phone'],
+                'Type' => 'organization',
+                'Company Name' => $params['def_orgname'],
 			) ,
 			'Billing' => array(
 				'First Name' => $params['def_firstname'],
@@ -361,10 +355,12 @@ function molddata_SaveContactDetails($params) {
 				'Email' => $params['def_email'],
 				'Address' => $params['def_address1'],
 				'City' => $params['def_city'],
-				'State' => $params['def_state'],
 				'Postcode' => $params['def_postcode'],
 				'Country' => $params['def_country'],
 				'Phone' => $params['def_phone'],
+                'Type' => 'organization',
+                'IDNO' => $params['def_taxid'],
+                'Company Name' => $params['def_orgname'],
 			) ,
 		);
 		$params['contactdetails'] = array_merge($params['contactdetails'], $default_contact);
@@ -381,6 +377,30 @@ function molddata_SaveContactDetails($params) {
 	}
 	return 'Successful';
 }
+
+// ############################################################################################################
+function molddata_TransferDomain($params) {
+	$epp = new nicmdEppClient($params['EPPHost'], $params['EPPPort'], $params['Login'], $params['Password']); // last argument debug=1
+	$res = $epp->login($params['EPPUser'], $params['EPPPassword']);
+	$epp_result = $epp->executeTransfer($params['eppcode']);
+	$epp->logout();
+	
+	molddata_DebugLog('transferdomain', $params, $epp);
+	return $epp_result;
+}
+
+// ############################################################################################################
+function molddata_GetEPPCode($params) {
+	$epp = new nicmdEppClient($params['EPPHost'], $params['EPPPort'], $params['Login'], $params['Password']); // last argument debug=1
+	$res = $epp->login($params['EPPUser'], $params['EPPPassword']);
+	$epp_result = $epp->requestTransfer($params['sld'].'.md');
+	$epp->logout();
+	
+	molddata_DebugLog('requestTransferCode', $params, $epp);
+	return $epp_result;
+}
+
+// ############################################################################################################
 
 function molddata_DebugLog($action, $params, $epp) {
 	if ($params['write_log'] !== 'on') {
