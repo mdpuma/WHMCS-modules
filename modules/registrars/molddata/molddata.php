@@ -199,7 +199,7 @@ function molddata_RenewDomain($params) {
 	
 	molddata_DebugLog('renew', $params, $epp);
 	logModuleCall('molddata', 'renew-result', $epp_result, '');
-	molddata_writeSqlLog('renew', $params['domainid'], '', $params);
+	molddata_writeSqlLog('renew', $params['domainid'], array(), $params);
 
 	return $epp_result;
 }
