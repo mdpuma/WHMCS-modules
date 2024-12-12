@@ -174,7 +174,7 @@ function molddata_RegisterDomain($params) {
 		'ns2' => $params['ns2'],
 	);
 
-	$epp_result = $epp->registerDomain($params['sld'], $params['regperiod'], $contacts, $nameservers);
+	$epp_result = $epp->registerDomain($params['sld'].'.md', $params['regperiod'], $contacts, $nameservers);
 	$epp->logout();
 
 	molddata_DebugLog('register', $params, $epp);
@@ -193,7 +193,7 @@ function molddata_RenewDomain($params) {
 	$epp = new nicmdEppClient($params['EPPHost'], $params['EPPPort'], $params['Login'], $params['Password']); // last argument debug=1
 	$epp->login($params['EPPUser'], $params['EPPPassword']);
 
-	$epp_result = $epp->renewDomain($params['sld'], $params['regperiod'], $domainExpDate);
+	$epp_result = $epp->renewDomain($params['sld'].'.md', $params['regperiod'], $domainExpDate);
 
 	$epp->logout();
 	
@@ -209,7 +209,7 @@ function molddata_GetNameservers($params) {
 	$epp = new nicmdEppClient($params['EPPHost'], $params['EPPPort'], $params['Login'], $params['Password']); // last argument debug=1
 	$epp->login($params['EPPUser'], $params['EPPPassword']);
 
-	$epp_result = $epp->getNameservers($params['sld'], $params['regperiod']);
+	$epp_result = $epp->getNameservers($params['sld'].'.md', $params['regperiod']);
 
 	$epp->logout();
 
@@ -227,7 +227,7 @@ function molddata_SaveNameservers($params) {
 		'ns2' => $params['ns2'],
 	);
 
-	$epp_result = $epp->saveNameservers($params['sld'], $nameservers);
+	$epp_result = $epp->saveNameservers($params['sld'].'.md', $nameservers);
 
 	$epp->logout();
 
@@ -280,7 +280,7 @@ function molddata_Sync($params) {
 	$epp = new nicmdEppClient($params['EPPHost'], $params['EPPPort'], $params['Login'], $params['Password']); // last argument debug=1
 	$epp->login($params['EPPUser'], $params['EPPPassword']);
 
-	$epp_result = $epp->getContactDetails($params['sld']);
+	$epp_result = $epp->getContactDetails($params['sld'].'.md');
 
 	if (isset($epp_result['error'])) {
 		if (preg_match("/domain not exists/", $epp_result['error'])) {
@@ -315,7 +315,7 @@ function molddata_Sync($params) {
 function molddata_GetContactDetails($params) {
 	$epp = new nicmdEppClient($params['EPPHost'], $params['EPPPort'], $params['Login'], $params['Password']); // last argument debug=1
 	$res = $epp->login($params['EPPUser'], $params['EPPPassword']);
-	$epp_result = $epp->getContactDetails($params['sld']);
+	$epp_result = $epp->getContactDetails($params['sld'].'.md');
 	unset($epp_result['Domain']);
 	// 	echo '<textarea>'.$epp->get_dialog().'</textarea>';
 	$epp->logout();
@@ -366,7 +366,7 @@ function molddata_SaveContactDetails($params) {
 		$params['contactdetails'] = array_merge($params['contactdetails'], $default_contact);
 	}
 
-	$epp_result = $epp->saveContactDetails($params['sld'], $params['contactdetails']);
+	$epp_result = $epp->saveContactDetails($params['sld'].'.md', $params['contactdetails']);
 	$epp->logout();
 
 	molddata_DebugLog('savecontactdetails', $params, $epp);
@@ -426,6 +426,8 @@ function molddata_writeSqlLog($action, $domainid, $nameservers = array(), $add =
 
 	try {
 		$statement = $pdo->prepare('insert into mod_molddata_domain_log (domainid, action, ns, additional, time) values (:domainid, :action, :ns, :additional, :time)');
+		
+		if(!is_array($nameservers)) $nameservers=array();
 		
 		$statement->execute([
 			':domainid' => $domainid,
