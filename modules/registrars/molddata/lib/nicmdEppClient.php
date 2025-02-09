@@ -332,8 +332,10 @@ class nicmdEppClient {
 		} else {
 			if (strstr($result,'domain:name res="0"')) {
 				$epp_result['error'] = 'Error: domain not exists';
-			} elseif (strstr($result,'domain:name res="2"')) {
+			} elseif (strstr($result,'domain:name res="3"')) {
 				$epp_result['error'] = 'Error: domain not in account';
+			} elseif (strstr($result,'domain:name res="2"')) {
+				$epp_result['error'] = 'Error: domain name syntax error';
 			} else {
 				$epp_result= array();
 				if (preg_match("/<domain:ns1_name>(.+)<\/domain:ns1_name>/",$result,$ns)) {
