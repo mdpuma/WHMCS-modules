@@ -225,6 +225,8 @@ function molddata_SaveNameservers($params) {
 	$nameservers = array(
 		'ns1' => $params['ns1'],
 		'ns2' => $params['ns2'],
+    'ns3' => $params['ns3'],
+    'ns4' => $params['ns4'],
 	);
 
 	$epp_result = $epp->saveNameservers($params['sld'].'.md', $nameservers);

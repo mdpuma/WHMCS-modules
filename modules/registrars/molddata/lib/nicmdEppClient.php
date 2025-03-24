@@ -342,13 +342,13 @@ class nicmdEppClient {
 					$epp_result['ns1'] = $ns[1];
 				}
 				if (preg_match("/<domain:ns1_ip>(.+)<\/domain:ns1_ip>/",$result,$ns)) {
-					$epp_result['ns1'] .= " ".$ns[1];
+					$epp_result['ns3'] .= $ns[1];
 				}
 				if (preg_match("/<domain:ns2_name>(.+)<\/domain:ns2_name>/",$result,$ns)) {
 					$epp_result['ns2'] = $ns[1];
 				}
 				if (preg_match("/<domain:ns2_ip>(.+)<\/domain:ns2_ip>/",$result,$ns)) {
-					$epp_result['ns2'] .= " ".$ns[1];
+					$epp_result['ns4'] .= $ns[1];
 				}
 			}
 		}
@@ -358,8 +358,8 @@ class nicmdEppClient {
 		if($this->is_logged==false) {
 			return false;
 		}
-		$ns1 = explode(" ",$nameservers['ns1']);
-		$ns2 = explode(" ",$nameservers['ns2']);
+		//$ns1 = explode(",",$nameservers['ns1']);
+		//$ns2 = explode(",",$nameservers['ns2']);
 		
 		$xml = '<?xml version="1.0" encoding="UTF-8"?>
 				<epp xmlns="urn:ietf:params:xml:ns:epp-1.0"
@@ -372,10 +372,10 @@ class nicmdEppClient {
 							<domain:account_pw>'.$this->pass.'</domain:account_pw>
 							<domain:name>'.$domain.'</domain:name>
 
-							<domain:ns1_name>'.$ns1[0].'</domain:ns1_name>
-							<domain:ns1_ip>'.@$ns1[1].'</domain:ns1_ip>
-							<domain:ns2_name>'.$ns2[0].'</domain:ns2_name>
-							<domain:ns2_ip>'.@$ns2[1].'</domain:ns2_ip>
+							<domain:ns1_name>'.$nameservers['ns1'].'</domain:ns1_name>
+							<domain:ns1_ip>'.$nameservers['ns3'].'</domain:ns1_ip>
+							<domain:ns2_name>'.$nameservers['ns2'].'</domain:ns2_name>
+							<domain:ns2_ip>'.$nameservers['ns4'].'</domain:ns2_ip>
 						</domain:update>
 					</update>
 					<clTRID>'.rand(10000,99999).'</clTRID>
