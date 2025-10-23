@@ -282,7 +282,8 @@ function molddata_Sync($params) {
 	$epp = new nicmdEppClient($params['EPPHost'], $params['EPPPort'], $params['Login'], $params['Password']); // last argument debug=1
 	$epp->login($params['EPPUser'], $params['EPPPassword']);
 
-	$epp_result = $epp->getContactDetails($params['sld'].'.md');
+	// $epp_result = $epp->getContactDetails($params['sld'].'.md');
+	$epp_result = $epp->getNameservers($params['sld'].'.md', '1');
 
 	if (isset($epp_result['error'])) {
 		if (preg_match("/domain not exists/", $epp_result['error'])) {
@@ -296,7 +297,7 @@ function molddata_Sync($params) {
 		}
 	}
 	else {
-		$result['expirydate'] = $epp_result['Domain']['Expiration Date'];
+		$result['expirydate'] = $epp_result['exp_date'];
 		$expiryEpoch = strtotime($result['expirydate']);
 		if ($expiryEpoch !== false) {
 			if (time() < $expiryEpoch) {

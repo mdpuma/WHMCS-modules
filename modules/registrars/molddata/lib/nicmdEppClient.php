@@ -350,6 +350,9 @@ class nicmdEppClient {
 				if (preg_match("/<domain:ns2_ip>(.+)<\/domain:ns2_ip>/",$result,$ns)) {
 					$epp_result['ns4'] .= $ns[1];
 				}
+				if (preg_match("/<domain:exp_date>(.+)</domain:exp_date>/", $result, $expdate)) {
+					$epp_result['exp_date'] = $expdate[1];
+				}
 			}
 		}
 		return $epp_result;
